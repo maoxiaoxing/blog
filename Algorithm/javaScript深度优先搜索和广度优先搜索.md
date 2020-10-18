@@ -111,3 +111,4 @@ const widthTraversal = (node) => {
 console.log(widthTraversal(tree))
 ```
 ![](https://img2020.cnblogs.com/blog/1575596/202008/1575596-20200810214347372-2061372421.png)
+
