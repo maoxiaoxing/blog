@@ -7,4 +7,5 @@
 
 ## 算法
 [1. javaScript深度优先搜索和广度优先搜索](https://github.com/maoxiaoxing/blog/blob/master/Algorithm/javaScript%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2%E5%92%8C%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2.md)
+
 [2. js实现二分法查找](https://github.com/maoxiaoxing/blog/blob/master/Algorithm/js%E5%AE%9E%E7%8E%B0%E4%BA%8C%E5%88%86%E6%B3%95%E6%9F%A5%E6%89%BE.md)
