@@ -31,7 +31,7 @@ person2.name = 'maoxiaoxing'
 console.log(person2) // { name: 'maoxiaoxing', age: 25 }
 console.log(person1) // { name: 'maoxiaoxing', age: 25 }
 ```
-![](https://img2020.cnblogs.com/blog/1575596/202010/1575596-20201011203917445-303972876.png)
+![](https://github.com/maoxiaoxing/blog/raw/master/Img/1575596-20201011203917445-303972876%20(1).png)
 
 ## 二、浅拷贝与深拷贝的区别
 - 赋值其实是将原始对象存储在栈中的指向堆内存的地址赋值给新对象，而不是堆中的数据。所以新对象的任何数据类型的属性值发生改变，都会影响到原始数据。
