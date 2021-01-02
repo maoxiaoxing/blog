@@ -61,7 +61,7 @@ console.log(deepTraversal1(tree), '深度优先搜索的递归实现')
 ```
 来看一下结果
 
-![](https://img2020.cnblogs.com/blog/1575596/202008/1575596-20200810213701456-334530902.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20200810213701456-334530902.png)
 
 ## 2. 深度优先搜索非递归实现
 优点：搜索速度快，不会发生爆栈
@@ -89,7 +89,7 @@ const deepTraversal2 = (node) => {
 
 console.log(deepTraversal2(tree), '深度优先搜索的非递归实现')
 ```
-![](https://img2020.cnblogs.com/blog/1575596/202008/1575596-20200810214011514-1311275305.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20200810214011514-1311275305.png)
 
 
 ## 3. 广度优先搜索
@@ -114,5 +114,5 @@ const widthTraversal = (node) => {
 
 console.log(widthTraversal(tree))
 ```
-![](https://img2020.cnblogs.com/blog/1575596/202008/1575596-20200810214347372-2061372421.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20200810214347372-2061372421%20(1).png)
 
