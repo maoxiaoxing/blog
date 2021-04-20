@@ -33,6 +33,41 @@ monorepo 使用一个项目来管理多个包，把不同功能的代码放在�
 
 Vue3.0 的代码虽然全部重写，但是 90% 以上的 API 依然兼容 2.x。并且根据社区的反馈，增加了 Composition API，这是为了解决 Vue2.x 在开发大型项目时，处理超大组件使用 Options API 不好拆分和重用的问题。
 
+#### 1. 怎样学习 Composition API？
+
+学习 Composition API 的最好的方式就是查看官方的 RFC（Request For Comments），Vue2 升级到 Vue3 的大的变动就是通过 RFC 的机制去确认的，首先管方给出一些提案，然后收集社区的反馈并讨论，最后确认。
+RFC官方地址：https://github.com/vuejs/rfcs
+Composition API 文档：https://v3.vuejs.org/guide/composition-api-introduction.html#why-composition-api
+
+#### 2. Composition API 的设计动机
+
+- Options API
+
+Vue2.x 中使用 Options API，即包含一个描述组件选项（data、methods、props等）的对象，Options API 在开发复杂组件时，同一个功能逻辑的代码会被拆分到不同选项。
+
+下面我们来看一个案例
+
+![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210420225737001-178248134.png)
+
+这个例子的代码很简单，就是当鼠标移动的时候，将鼠标的位置展示到页面上。但是当我们想要添加新功能例如搜索功能的时候，我们就需要在多个 option 中添加我们的代码，这就显得有些麻烦。而且 Options API 很难提取一些公共代码，虽然我们可以使用 mixin 去提取一些课重用的逻辑，但是 mixin 的使用也有很多问题，例如命名冲突和数据来源不清晰等问题。
+
+- Composition API
+
+Composition API 是 Vue3.0 新增的 API，是一组基于函数的 API，可以更灵活的组织组件的逻辑。
+
+我们可以使用 Composition API 来重写一下我们刚才的逻辑
+
+![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210420230642966-1415541883.png)
+
+上面的代码我们可以看到，我们将所有重复的功能都封装在 useMousePosition 这个函数中，当我们需要使用的时候，我们只需要在 setup 这个函数中去调用即可。这样我们在查看某个逻辑的时候，只需要查看某个函数即可，不用再在各个 option 中来回查找了。
+
+下面我们来一张 Options API 和 Composition API 的对比图：
+
+![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210420231055321-385741458.png)
+
+相同颜色的代表同样的功能，我们可以看到 Options API 中同样的功能被拆分成了不同的代码块，当组件的功能比较复杂的时候，同一逻辑的代码被拆分到不同的位置，开发者就需要耗费一定的精力去组织这些逻辑。而 Composition API 中相同的逻辑都在同一个代码块，这样在处理组件的时候会比较清晰。当然了 Composition API 只是 Vue3 新增的一组 API，你完全可以将 Options API 和 Composition API 结合起来使用，更加灵活的实现你的逻辑。
+
+
 ### 性能提升
 
 Vue3.0 中使用 Proxy 重写了响应式原理，并且对编译器做了优化，重写了虚拟 DOM，从而让渲染和 update 的性能都有了大幅度的提升。另外官方介绍服务端渲染的性能也提升了两到三倍。
