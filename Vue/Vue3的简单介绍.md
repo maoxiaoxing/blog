@@ -103,6 +103,8 @@ template 被编译后：
 
 #### 3. 源码体积的优化
 
+Vue3.0 中移除了一些不常用的 API，例如：inline-template、filter（我本人挺喜欢用的[手动狗头]）等。
+Vue3.0 中对 Tree-shaking 的支持更好，Tree-shaking 依赖 ES Module，也就是 ES6 中的模块化语法（import、export），通过编译的静态分析，找到没有引入的模块，在打包的时候过滤掉，让打包的体积更小。Vue3.0 在设计之初，就考虑到了 Tree-shaking，内置的组件比如 transition、keep-live，内置的指令比如 v-model 都是按需引入的，另外 Vue3.0 的其他很多 API 都是支持 Tree-shaking 的，只有核心模块和你使用了的才会打包，不使用就不会打包。
 
 ### Vite
 
