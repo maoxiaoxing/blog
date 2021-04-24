@@ -109,3 +109,33 @@ Vue3.0 中对 Tree-shaking 的支持更好，Tree-shaking 依赖 ES Module，也
 ### Vite
 
 随着 Vue3.0 的发布，管方也发布了新的构建工具 Vite，在开发和测试阶段 Vite 不需要打包，而可以直接运行项目，大大提升了开发的效率。
+我们再来介绍 Vite 之前，先来看看 ES Module 规范，因为 Vite 是基于 ES Module 规范的，如果你对 ES Module 规范不太了解，可以看看我之前写的 [模块化开发](https://www.cnblogs.com/bejamin/p/13982677.html)。
+现代浏览器基本都支持 ES Module （IE不支持【手动可恶！】），ES Module 有一些特性：
+- 通过下面的方式加载模块
+
+```js
+<script type="module" src="..."></script>
+```
+
+- 支持模块的 script 默认延迟加载
+  * 类似于 script 标签设置 defer
+  * 在文档解析完成后，触发 DOMContentLoaded 事件前执行
+
+Vite 之所以快，就是因为 Vite 直接使用 ES Module 去加载模块，在开发模式下不需要打包就可以直接运行；而 Vue-cli 开发模式下必须对项目打包才可以运行。
+
+#### Vite 特点
+
+- 快速冷启动
+
+因为不需要打包，所以 Vite 可以利用 ES Module 的特性快速启动项目
+
+- 按需编译
+
+代码是按需编译的，因此只有代码在当前运行环境需要加载的时候才会编译，你不需要在开启开发服务器的时候等待所有项目文件打包，当项目比较大的时候，这个节省的时间就比较明显。
+
+- 模块热更新
+
+Vite 支持模块热更新，并且模块热更新的性能与模块总数无关，无论你有多少模块，hmr 的速度始终比较快。
+
+Vite 在生产环境下使用 Rollup 打包，Rollup 基于浏览器原生的 ES Module 的方式打包，不需要使用 babel 把 import 转换成 require，以及相应的辅助函数，因此打包的体积会比 webpack 打包的体积小很多。
+
