@@ -139,3 +139,19 @@ Vite 支持模块热更新，并且模块热更新的性能与模块总数无关
 
 Vite 在生产环境下使用 Rollup 打包，Rollup 基于浏览器原生的 ES Module 的方式打包，不需要使用 babel 把 import 转换成 require，以及相应的辅助函数，因此打包的体积会比 webpack 打包的体积小很多。
 
+#### Vite 创建项目
+
+- Vite 创建 vue 项目
+
+```bash
+npm init vite-app <project-name>
+cd <project-name>
+npm install
+npm run dev
+```
+
+- 基于模板创建项目
+
+```bash
+npm init vite-app -- template react
+```
