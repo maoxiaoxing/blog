@@ -155,3 +155,19 @@ npm run dev
 ```bash
 npm init vite-app -- template react
 ```
+
+![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210425224748581-386153013.png)
+
+![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210425224444588-768371206.png)
+
+项目运行起来，我们可以右键查看网页源代码，就能看到 Vue 的入口文件 main.js 确实是通过 ES Module 方式引入的。
+
+我们再来看看控制台 netWork 请求到的 App.vue 的解析结果
+
+![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210425225426832-2068268611.png)
+
+首先 Vite 开启的服务器会劫持以 .vue 结尾的请求，会把以 .vue 结尾的文件解析成 js 文件，并将响应头的 Content-Type 设置为 application/javascript，目的就是为了告诉浏览器，现在我给你发送的是一个 javascript 脚本
+
+![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210425225517275-2073245084.png)
+
+这次我们来看看 App.vue 又被请求了一次，不同的是这次带了一个 type=template 的参数，这次请求服务器之后，服务器会把 App.vue 这个单文件组件通过 Vue3.0 中的模块 compiler-sfc 给编译成 render 函数，这基本就是 Vite 的工作原理。
