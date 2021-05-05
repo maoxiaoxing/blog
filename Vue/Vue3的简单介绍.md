@@ -13,7 +13,7 @@
 monorepo 使用一个项目来管理多个包，把不同功能的代码放在不同的包中去管理，这样每个功能模块的划分都很明确，模块之间的依赖关系也很明确，并且每个功能模块都可以单独测试、单独发布、单独使用。
 我们可以来看看源码中的 packages 的目录结构：
 
-![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210419231009340-1975656231.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20210419231009340-1975656231.png)
 
 > compiler-core 和平台无关的编译器
 > compiler-dom 浏览器平台下的编译器，依赖于 compiler-core
@@ -47,7 +47,7 @@ Vue2.x 中使用 Options API，即包含一个描述组件选项（data、method
 
 下面我们来看一个案例
 
-![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210420225737001-178248134.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20210420225737001-178248134.png)
 
 这个例子的代码很简单，就是当鼠标移动的时候，将鼠标的位置展示到页面上。但是当我们想要添加新功能例如搜索功能的时候，我们就需要在多个 option 中添加我们的代码，这就显得有些麻烦。而且 Options API 很难提取一些公共代码，虽然我们可以使用 mixin 去提取一些课重用的逻辑，但是 mixin 的使用也有很多问题，例如命名冲突和数据来源不清晰等问题。
 
@@ -57,13 +57,13 @@ Composition API 是 Vue3.0 新增的 API，是一组基于函数的 API，可以
 
 我们可以使用 Composition API 来重写一下我们刚才的逻辑
 
-![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210420230642966-1415541883.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20210420230642966-1415541883.png)
 
 上面的代码我们可以看到，我们将所有重复的功能都封装在 useMousePosition 这个函数中，当我们需要使用的时候，我们只需要在 setup 这个函数中去调用即可。这样我们在查看某个逻辑的时候，只需要查看某个函数即可，不用再在各个 option 中来回查找了。
 
 下面我们来一张 Options API 和 Composition API 的对比图：
 
-![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210420231055321-385741458.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20210420231055321-385741458.png)
 
 相同颜色的代表同样的功能，我们可以看到 Options API 中同样的功能被拆分成了不同的代码块，当组件的功能比较复杂的时候，同一逻辑的代码被拆分到不同的位置，开发者就需要耗费一定的精力去组织这些逻辑。而 Composition API 中相同的逻辑都在同一个代码块，这样在处理组件的时候会比较清晰。当然了 Composition API 只是 Vue3 新增的一组 API，你完全可以将 Options API 和 Composition API 结合起来使用，更加灵活的实现你的逻辑。
 
@@ -81,7 +81,7 @@ Vue2.x 中的响应式原理的核心是 Object.defineProperty，在 data 初始
 
 我们先来通过一个组件来回顾 Vue2.x 的编译执行过程
 
-![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210421224516062-1176756196.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20210421224516062-1176756196.png)
 
 在 Vue2.x 中模板首先会编译成 render 函数，这个过程一般是在构建的过程中完成的，在编译的时候，会编译静态根节点和静态节点，静态根节点必须要求有一个静态子节点，当组件发生变化时会触发 Watcher，然后触发 Watcher 的 update 函数，最终去执行虚拟 DOM 的 patch 操作，diff 的过程中会去遍历比较所有的虚拟 DOM ，通过双指针的算法去比较新旧 DOM，找到差异然后更新到真实 DOM 上。Vue2.x 中渲染的最小单位是组件，通过标记静态根节点，在 diff 的过程中跳过静态根节点，优化 diff 操作，但是静态节点还是需要 diff，这个过程没有被优化。
 Vue3.0 为了提升性能，会标记和提升所有的静态节点，diff 的时候只需要对比动态节点内容。另外在 Vue3.0 中引入了 Fragments 的特性，模板中不需要放一个唯一的根节点，模板中可以直接放文本内容，也可以放很多同级的 HTML 标签，但是在 vscode 中需要升级你的 vetur 插件，否则编译器会报错。
@@ -90,11 +90,11 @@ Vue3.0 为了提升性能，会标记和提升所有的静态节点，diff 的�
 
 template：
 
-![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210422224812050-1702766284.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20210422224812050-1702766284.png)
 
 template 被编译后：
 
-![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210422224859120-635655396.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20210422224859120-635655396.png)
 
 在 Vue3.0 中，如果模板的最外层没有根节点的话，就会创建一个 Fragment 片段，操作 Fragment 的代价是很小的，相对于操作 DOM 耗费的性能非常小。
 我们能看到 _hoisted_1、_hoisted_2、_hoisted_3 这样的静态节点被提升到了 render 的外层，这样只有在页面初始化的时候会创建一次，下次视图重新渲染后直接引用静态节点即可，这样的静态节点也不会参与 diff 的过程。
@@ -156,18 +156,18 @@ npm run dev
 npm init vite-app -- template react
 ```
 
-![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210425224748581-386153013.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20210425224748581-386153013.png)
 
-![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210425224444588-768371206.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20210425224444588-768371206.png)
 
 项目运行起来，我们可以右键查看网页源代码，就能看到 Vue 的入口文件 main.js 确实是通过 ES Module 方式引入的。
 
 我们再来看看控制台 netWork 请求到的 App.vue 的解析结果
 
-![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210425225426832-2068268611.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20210425225426832-2068268611.png)
 
 首先 Vite 开启的服务器会劫持以 .vue 结尾的请求，会把以 .vue 结尾的文件解析成 js 文件，并将响应头的 Content-Type 设置为 application/javascript，目的就是为了告诉浏览器，现在我给你发送的是一个 javascript 脚本
 
-![](https://img2020.cnblogs.com/blog/1575596/202104/1575596-20210425225517275-2073245084.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20210425225517275-2073245084.png)
 
 这次我们来看看 App.vue 又被请求了一次，不同的是这次带了一个 type=template 的参数，这次请求服务器之后，服务器会把 App.vue 这个单文件组件通过 Vue3.0 中的模块 compiler-sfc 给编译成 render 函数，这基本就是 Vite 的工作原理。
