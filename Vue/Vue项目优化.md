@@ -62,3 +62,26 @@ export default {
   },
 }
 ```
+
+## v-for 遍历避免同时使用 v-if
+
+v-for 的优先级其实是比 v-if 高的，所以当两个指令出现来一个 DOM 中，那么 v-for 渲染的当前列表，每一次都需要进行一次 v-if 的判断。而相应的列表也会重新变化，这个看起来是非常不合理的。因此当你需要进行同步指令的时候。尽量使用计算属性，先将 v-if 不需要的值先过滤掉。他看起像是下面这样的。
+
+```js
+// 计算属性
+computed: {
+  filterList() {
+    return this.showData.filter((data) => {
+      return data.isShow
+    })
+  }
+}
+  
+// DOM
+  
+<ul>
+  <li v-for="item in filterList" :key="item.id">
+  {{ item.name }}
+  </li>
+</ul>
+```
