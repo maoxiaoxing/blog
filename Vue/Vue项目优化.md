@@ -154,3 +154,129 @@ beforeDestroy() {
     * 使用 tinypng 等工具
     * 注意：不建议用 webpack 构建压缩图片。
     * 如果是动态图片，比如用户创建的文章中的图片，这个肯定是建议由后端来压缩，现代化的后端也很少自己处理图片压缩了，大多数都是用的付费的云服务。
+
+## 路由懒加载
+
+Vue  是单页面应用，可能会有很多的路由引入 ，这样使用 webpcak 打包后的文件很大，当进入首页时，加载的资源过多，页面会出现白屏的情况，不利于用户体验。如果我们能把不同路由对应的组件分割成不同的代码块，然后当路由被访问的时候才加载对应的组件，这样就更加高效了。这样会大大提高首屏显示的速度，但是可能其他的页面的速度就会降下来。
+
+```js
+// require 语法
+component: resolve=>(require(['@/components/HelloWorld'],resolve))
+
+// import 语法
+component: () => import('@/components/HelloWorld')
+```
+
+注意：路由懒加载就是异步组件，异步组件不宜太多，否则会有打包性能问题。
+提醒一下：不是非得路由才能用异步组件，在普通组件中也可以使用异步组件。
+
+## 第三方组件库的按需引入
+
+确保在使用UI框架如， Element ， And Design 等UI框架的时候，都使用官方给暴露出来的按需加载组件。只有真正用到它的时候时候才会加载当前UI框架的组件，而不是一开始就将整个组件库给加载出来，我们都知道，一个UI框架其实很大，相对比其他的东西来说。因此，它在方便我们开发者的同时，也无形中产生了多余的开销。但是项目周期开发的时候，不得不依赖它。所以建议尽量的使用按需加载。合理的对项目进行止损，如果你不在意，非常嫌麻烦，那么可以进行全局引入。
+
+## 首屏渲染优化
+
+- 路由懒加载
+- 在首页加入 loading 动画、骨架屏
+- 预渲染，没什么动态数据的页面直接预渲染成静态页面
+- 极限方案：服务端渲染，如果仅仅是因为首屏渲染慢，其实也不建议引入服务端渲染方案，因为成本还是比较高的，除非你要解决SEO，这个事实你就不得不得上服务端渲染了。
+
+## 不打包第三方包
+
+在 Vue CLI 配置文件中告诉 webpack 当加载这些第三方包的时候通过全局进行查找，而不是去编译加载它们。
+
+```js
+const isProd = process.env.NODE_ENV === 'production'
+
+const cdn = {
+  externals: {
+    'element-ui': 'ELEMENT',
+    vue: 'Vue',
+    moment: 'moment'
+  },
+  js: [
+    'https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.min.js',
+    'https://cdn.jsdelivr.net/npm/element-ui@2.14.1/lib/index.min.js',
+    'https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js'
+  ],
+  css: [
+    'https://cdn.jsdelivr.net/npm/element-ui@2.14.1/lib/theme-chalk/index.css'
+  ]
+}
+
+const config = {
+  ...
+
+  chainWebpack: config => {
+    if (isProd) {
+      config.plugin('html').tap(args => {
+        args[0].cdn = cdn
+        return args
+      })
+    }
+  },
+
+  configureWebpack: {}
+}
+
+if (isProd) {
+  config.configureWebpack.externals = cdn.externals
+}
+
+module.exports = config
+```
+
+> 关于 webpack 中 externals 的配置参考这里：https://webpack.js.org/configuration/externals/。
+
+在 index.html 文件中引入希望被编译的第三方包的 CDN 资源链接：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <% for (var i in htmlWebpackPlugin.options.cdn && htmlWebpackPlugin.options.cdn.css) { %>
+      <link rel="stylesheet" href="<%= htmlWebpackPlugin.options.cdn.css[i] %>">
+    <% } %>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <script src="/aliyun-upload-sdk/lib/es6-promise.min.js"></script>
+    <script src="/aliyun-upload-sdk/lib/aliyun-oss-sdk-5.3.1.min.js"></script>
+    <script src="/aliyun-upload-sdk/aliyun-upload-sdk-1.5.0.min.js"></script>
+    <% for (var i in htmlWebpackPlugin.options.cdn && htmlWebpackPlugin.options.cdn.js) { %>
+      <script src="<%= htmlWebpackPlugin.options.cdn.js[i] %>"></script>
+    <% } %>
+  </body>
+</html>
+```
+
+需要注意的是虽然不需要使用 node_modules 中的第三方包了，但是包的依赖信息最好还是保留在 package.json 中。
+保留它的原因主要有两方面：
+
+- 更明确的依赖信息
+- TypeScript 需要包里面的类型声明信息
+
+此外也不建议把所有的第三方都不打包，因为这样会造成请求资源过多反而导致加载变慢。
+
+## 传输层优化
+
+为了进一步加速资源请求，可以开启服务器 gizp 压缩，目前大部分浏览器都支持 gzip，可以开启服务器的 gzip 功能，服务器在传输资源之前先进行压缩。
+网络请求 Request 中会出现如下内容，就表示支持 gzip：
+
+```http
+Accept-Encoding: gzip, deflate, br
+```
+
+## HTTP 缓存
+
+参考：https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Caching。
+
+好了，至此总结了一些能在 Vue 项目中使用的优化策略，有一些说的比较粗略，你可以把这篇博文当做一个引导，然后自己在开发中再去深入研究细节。
