@@ -116,3 +116,27 @@ export default {
 项目当中，会涉及到非常多的长列表场景，区别于普通的分页来说，大部分的前端在做这种 无限列表 的时候，大部分新手前端都是通过一个 vFor 将数据遍历出来，想的多一点的就是做一个分页。滚动到底部的时候就继续请求 API 。其实这也是未思考妥当的。随着数据的加载，DOM会越来越多，这样就导致了性能开销的问题产生了，当页面上的DOM太多的时候，难免给我的客户端造成一定的压力，所以对于长列表渲染的时候，建议将DOM移除掉，类似于图片懒加载的模式，只有出现在视图上的DOM才是重要的DOM。网络上有一些很好的解决方案，像 ElementUI 和 Ant-design 这样的 UI 库都是有无限滚动的组件的，如 [vue-virtual-scroller](https://github.com/Akryum/vue-virtual-scroller)、[vue-virtual-scroll-list](https://github.com/tangbc/vue-virtual-scroll-list) 库等等，大家可以理性的选择。
 
 其它解决方案见：https://github.com/vuejs/awesome-vue#infinite-scroll。
+
+## 释放组件资源
+
+Vue 组件销毁时，会自动清理它与其它实例的连接，解绑它的全部指令及事件监听器，但是仅限于组件本身的事件。 如果在 js 内使用 addEventListene 等方式是不会自动销毁的，我们需要在组件销毁时手动移除这些事件的监听，以免造成内存泄露，如：
+
+```js
+created() {
+  addEventListener('click', this.click, false)
+},
+beforeDestroy() {
+  removeEventListener('click', this.click, false)
+}
+```
+
+再比如定时器：
+
+```js
+created() {
+  this.currentInterVal = setInterval(code, millisec, lang)
+},
+beforeDestroy() {
+  clearInterval(this.currentInterVal)
+}
+```
