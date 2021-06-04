@@ -41,3 +41,11 @@ render(jsx, document.getElementById("root"))
 ![](https://img2020.cnblogs.com/blog/1575596/202106/1575596-20210604083840102-1239227374.png)
 
 可以看到，jsx 代码被转换成了真实的 DOM 添加到了页面中
+
+## Fiber 如何解决性能问题的思路
+
+1. 在 Fiber 架构中 React 放弃了递归调用，采用循环来模拟递归，因为循环可以随时被中断。
+2. Fiber 将大的渲染任务拆分成一个个小任务
+3. React 使用 requestIdleCallback 去利用浏览器的空闲时间去执行小任务，React 在执行一个任务单元后，查看是否有其他高优先级的任务，如果有，放弃占用线程，先执行优先级高的任务。
+
+
