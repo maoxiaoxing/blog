@@ -146,3 +146,5 @@ IdleDeadline 参数上有一个 timeRemaining() 的方法，返回一个时间 [
 </script>
 ```
 
+上面的代码是使用了 requestIdleCallback 去优化的，运行之后，在点击 更改背景颜色 的按钮后，立马就能看到颜色的变化，这就是 requestIdleCallback 的作用。
+
