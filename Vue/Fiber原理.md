@@ -348,3 +348,8 @@ lastEffect 是存储在当前 Fiber 对象的父级上的，当父级发生变�
 
 ![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/Fiber%E9%93%BE%E8%A1%A8%E6%8C%87%E5%90%91.png)
 
+## 总结
+
+其实 Fiber 的总体思路就是利用循环和链表代替递归去优化性能，Fiber 架构有两个阶段，render 阶段就是负责构架 Fiber 对象和链表，而 commit 阶段就是负责去构建 DOM，上面简单的实现了 Fiber ，只是为了理解方便
+下面是实现 Fiber 的完整版
+https://github.com/maoxiaoxing/react-study/tree/master/Fiber
