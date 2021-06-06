@@ -148,3 +148,203 @@ IdleDeadline 参数上有一个 timeRemaining() 的方法，返回一个时间 [
 
 上面的代码是使用了 requestIdleCallback 去优化的，运行之后，在点击 更改背景颜色 的按钮后，立马就能看到颜色的变化，这就是 requestIdleCallback 的作用。
 
+## Fiber 原理分析
+
+下面我们通过实现一个简易版本的 Fiber 来了解一下 Fiber 的原理
+### 什么是 Fiber
+
+我们闲扯了这么多，那么 Fiber 到底是什么呢？
+Fiber 是 React 的一个执行单元，在 React 16 之后，React 将整个渲染任务拆分成了一个个的小任务进行处理，每一个小任务指的就是 Fiber 节点的构建。
+拆分的小任务会在浏览器的空闲时间被执行，每个任务单元执行完成后，React 都会检查是否还有空余时间，如果有就交换主线程的控制权。
+
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/Fiber%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
+
+Fiber 是一种数据结构，支撑 Fiber 构建任务的运转。当某一个 Fiber 任务执行完成后，怎样去找下一个要执行的 Fiber 任务呢？React 通过链表结构找到下一个要执行的任务单元。
+Fiber 其实就是 JavaScript 对象，在这个对象中有 child 属性表示节点的子节点，有 sibling 属性表示节点的下一个兄弟节点，有 return 属性表示节点的父级节点。
+
+```js
+// 简易版 Fiber 对象
+type Fiber = {
+  // 组件类型 div、span、组件构造函数
+  type: any,
+  // DOM 对象
+  stateNode: any,  
+  // 指向自己的父级 Fiber 对象
+  return: Fiber | null,
+  // 指向自己的第一个子级 Fiber 对象
+  child: Fiber | null,
+  // 指向自己的下一个兄弟 iber 对象
+  sibling: Fiber | null,
+}
+```
+
+### 实现一个简易版 Fiber
+
+Fiber 的工作分为两个阶段：render 阶段和 commit 阶段。
+
+- render 阶段：构建 Fiber 对象，构建链表，在链表中标记要执行的 DOM 操作 ，可中断。
+- commit 阶段：根据构建好的链表进行 DOM 操作，不可中断。
+
+```js
+const jsx = (
+  <div id="a1">
+    <div id="b1">
+      <div id="c1"></div>
+      <div id="c2"></div>
+    </div>
+    <div id="b2"></div>
+  </div>
+)
+
+const container = document.getElementById("root")
+
+// 构建根元素的 Fiber 对象
+const workInProgressRoot = {
+  stateNode: container,
+  props: {
+    children: [jsx]
+  }
+}
+
+// 下一个要执行的任务
+let nextUnitOfWork = workInProgressRoot
+
+function workLoop(deadline) {
+  // 1. 是否有空余时间
+  // 2. 是否有要执行的任务
+  while (nextUnitOfWork && deadline.timeRemaining() > 0) {
+    nextUnitOfWork = performUnitOfWork(nextUnitOfWork)
+  }
+  // 表示所有的任务都已经执行完成了
+  if (!nextUnitOfWork) {
+    // 进入到第二阶段 执行DOM
+    commitRoot()
+  }
+}
+
+function performUnitOfWork(workInProgressFiber) {
+  // 1. 创建 DOM 对象并将它存储在 stateNode 属性
+  // 2. 构建当前 Fiber 的子级 Fiber
+  // 向下走的过程
+  beginWork(workInProgressFiber)
+  // 如果当前Fiber有子级
+  if (workInProgressFiber.child) {
+    // 返回子级 构建子级的子级
+    return workInProgressFiber.child
+  }
+
+  while (workInProgressFiber) {
+    // 向上走，构建链表
+    completeUnitOfWork(workInProgressFiber)
+
+    // 如果有同级
+    if (workInProgressFiber.sibling) {
+      // 返回同级 构建同级的子级
+      return workInProgressFiber.sibling
+    }
+    // 更新父级
+    workInProgressFiber = workInProgressFiber.return
+  }
+}
+
+// 构建子集
+function beginWork(workInProgressFiber) {
+  // 1. 创建 DOM 对象并将它存储在 stateNode 属性
+  if (!workInProgressFiber.stateNode) {
+    // 创建 DOM
+    workInProgressFiber.stateNode = document.createElement(
+      workInProgressFiber.type
+    )
+    // 为 DOM 添加属性
+    for (let attr in workInProgressFiber.props) {
+      if (attr !== "children") {
+        workInProgressFiber.stateNode[attr] = workInProgressFiber.props[attr]
+      }
+    }
+  }
+  // 2. 构建当前 Fiber 的子级 Fiber
+  if (Array.isArray(workInProgressFiber.props.children)) {
+    let previousFiber = null
+    workInProgressFiber.props.children.forEach((child, index) => {
+      let childFiber = {
+        type: child.type,
+        props: child.props,
+        effectTag: "PLACEMENT",
+        return: workInProgressFiber
+      }
+      if (index === 0) {
+        // 构建子集，只有第一个子元素是子集
+        workInProgressFiber.child = childFiber
+      } else {
+        // 不是第一个，则构建子集的 兄弟级
+        previousFiber.sibling = childFiber
+      }
+      previousFiber = childFiber
+    })
+  }
+  // console.log(workInProgressFiber)
+}
+
+function completeUnitOfWork(workInProgressFiber) {
+  // 获取当前 Fiber 的父级
+  const returnFiber = workInProgressFiber.return
+  // 父级是否存在
+  if (returnFiber) {
+    // 需要执行 DOM 操作的 Fiber
+    if (workInProgressFiber.effectTag) {
+      if (!returnFiber.lastEffect) {
+        returnFiber.lastEffect = workInProgressFiber.lastEffect
+      }
+
+      if (!returnFiber.firstEffect) {
+        returnFiber.firstEffect = workInProgressFiber.firstEffect
+      }
+
+      if (returnFiber.lastEffect) {
+        returnFiber.lastEffect.nextEffect = workInProgressFiber
+      } else {
+        returnFiber.firstEffect = workInProgressFiber
+      }
+      returnFiber.lastEffect = workInProgressFiber
+    }
+  }
+}
+
+function commitRoot() {
+  let currentFiber = workInProgressRoot.firstEffect
+  while (currentFiber) {
+    currentFiber.return.stateNode.appendChild(currentFiber.stateNode)
+    currentFiber = currentFiber.nextEffect
+  }
+}
+
+// 在浏览器空闲的时候执行任务
+requestIdleCallback(workLoop)
+```
+
+### 构建 Fiber 链表
+
+上面的 completeUnitOfWork 函数就是用来构建 Fiber 链表的，只在在链表中的才会渲染
+1. 链表的构建顺序是怎么样的 ？
+
+链表的顺序是由 DOM 操作的顺序决定的，c1 是第一个要执行 DOM 操作的所以它是链的开始，A1 是最后一个被添加到 Root 中的元素，所以它是链的最后。
+
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/Fiber%E6%9E%84%E5%BB%BA%E9%93%BE%E8%A1%A8%E7%A4%BA%E6%84%8F%E5%9B%BE.png)
+
+2. 如何向链的尾部添加新元素？
+
+在链表结构中通过 nextEffect 存储链中的下一项。
+
+在构建链表的过程中，需要通过一个变量存储链表中的最新项，每次添加新项时都使用这个变量，每次操作完成后都需要更新它。这个变量在源码中叫做 lastEffect。
+
+lastEffect 是存储在当前 Fiber 对象的父级上的，当父级发生变化时，为避免链接顺序发生错乱，lastEffect 要先上移然后再追加nextEffect
+
+3. 将链表保存在什么位置？
+
+链表需要被保存在 Root 中，因为在进入到第二阶段时，也就是 commitRoot 方法中，是将 Root 提交到第二阶段的。 
+在源码中，Root Fiber 下有一个叫 firstEffect 的属性，用于存储链表。
+在构建链表的遍历过程中，C1 开始，Root 是结尾，如何才能将 C1 存储到 Root 中呢？
+其实是链头的不断上移做到的。
+
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/Fiber%E9%93%BE%E8%A1%A8%E6%8C%87%E5%90%91.png)
+
