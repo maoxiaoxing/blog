@@ -38,7 +38,7 @@ function render(vdom, container) {
 render(jsx, document.getElementById("root"))
 ```
 
-![](https://img2020.cnblogs.com/blog/1575596/202106/1575596-20210604083840102-1239227374.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20210604083840102-1239227374.png)
 
 可以看到，jsx 代码被转换成了真实的 DOM 添加到了页面中
 
@@ -58,7 +58,7 @@ render(jsx, document.getElementById("root"))
 
 requestIdleCallback 接收两个参数，一个名为 IdleDeadline 的回调函数，一个是可选参数
 
-![](https://img2020.cnblogs.com/blog/1575596/202106/1575596-20210605083507552-1546195424.png)
+![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20210605083507552-1546195424.png)
 
 IdleDeadline 参数上有一个 timeRemaining() 的方法，返回一个时间 [DOMHighResTimeStamp](https://developer.mozilla.org/zh-CN/docs/Web/API/DOMHighResTimeStamp), 并且是浮点类型的数值，它用来表示当前闲置周期的预估剩余毫秒数。如果idle period已经结束，则它的值是0。你的回调函数(传给requestIdleCallback的函数)可以重复的访问这个属性用来判断当前线程的闲置时间是否可以在结束前执行更多的任务。
 
