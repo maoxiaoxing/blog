@@ -10,7 +10,7 @@ React 核心成员 [Sebastian Markbåge](https://github.com/sebmarkbage/) (Hooks
 
 ![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/1575596-20210725223512026-1437088832.png)
 
-代数效应是函数式编程的一个概念，它所解决的一部分问题只在纯函数式编程中才存在，是为了分离一些副作用。代数效应实际上是一个比较领先的理念（写这篇博客为止），这种感觉就像你在写回调去解决异步问题，突然有一天有一个人告诉你有一个叫 async/await 的东西，有点那个味了，是不是？
+代数效应是函数式编程的一个概念，它所解决的一部分问题只在纯函数式编程中才存在，是为了分离一些副作用。代数效应实际上是一个比较领先的理念（写这篇博客为止），这种感觉就像你在写回调去解决异步问题，突然有一天有一个人告诉你有一个叫 async/await 的东西！
 有人看到这可能就会说了，我不关心什么破代数效应，不要跟我讲大道理，直接给老子上代码就行了≦(._.)≧
 代数效应看起来像是很高深的原理，下面我们用一些虚构的伪代码来解释一下什么是代数效应。
 
@@ -136,6 +136,8 @@ export default Friend
 ```
 
 ![](https://gitee.com/maoxiaoxing/mxx-blog/raw/master/Img/useState2.gif)
+
+上面这段代码，是不是和 try...handle 非常像，有点那个味了，是不是？没错，useState 和 useEffect 的组合就是 React 践行代数效应的最好示例。
 
 ### useState 原理
 
